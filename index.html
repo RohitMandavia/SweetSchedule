@@ -1,18 +1,14 @@
 <script src="https://s3.amazonaws.com/stitch-sdks/js/library/v3/stable/stitch.min.js"></script>
 <script>
-
-window.onload = function(){
-    var name = prompt("What's your name?");
-    var lengthOfName = name.length
-    document.getElementById('output').innerHTML = name;
-	  var clientPromise = stitch.StitchClientFactory.create('sweet_scheduler-opazw');
+  const clientPromise = stitch.StitchClientFactory.create('sweet_scheduler-opazw');
   clientPromise.then(client => {
-    var db = client.service('mongodb', 'mongodb-atlas').db('classes_data');
-	var coll = db.collection('student');
-	db.collection('student').insertOne({owner_id: client.authedId()}, {$set:{number:6969}}, {upsert:true})
-	db.collection('student').insertOne({owner_id: client.authedId()}, {$set:{number:696}}, {upsert:true})
-    client.login().then(()=>
-      db.collection('student').find({owner_id: client.authedId()}).limit(100).execute()
+    const db = client.service('mongodb', 'mongodb-atlas').db('classes_data');
+	var c = db.collection('student')
+    client.login().then(() => {
+	  console.log("adding")
+      db.collection('student').insertOne({"Name": "rohit"})
+	}).then(()=>
+      c.find().limit(100).execute()
     ).then(docs => {
       console.log("Found docs", docs)
       console.log("[MongoDB Stitch] Connected to Stitch")
@@ -20,19 +16,58 @@ window.onload = function(){
       console.error(err)
     });
   });
+  
+  
+  myFunction = function() {
+//  const clientPromise = stitch.StitchClientFactory.create('sweet_scheduler-opazw');
+  clientPromise.then(client => {
+    const db = client.service('mongodb', 'mongodb-atlas').db('classes_data');
+	var c = db.collection('student')
+	var i
+    client.login().then(() =>
+      c.insertOne({Name: "on click"})
+    ).then(()=>
+      c.find().limit(1).execute()
+    ).then(docs => {
+//	  for(i=0; i<=20; i++) {
+//		c.deleteOne({ })
+//	  }
+	console.log(c.find({"Name":"rohit"}))
+//	  while(c.find( {"Name": "rohit"} ) != "undefined") {
+//		console.log("removing")
+//		c.deleteOne( { } )
+//	  }
+      console.log("Found docs", docs)
+      console.log("[MongoDB Stitch] Connected to Stitch")
+    }).catch(err => {
+      console.error(err)
+    });
+  });
+	};
+  
+  clearFunction = function() {
+//  const clientPromise = stitch.StitchClientFactory.create('sweet_scheduler-opazw');
+  clientPromise.then(client => {
+    const db = client.service('mongodb', 'mongodb-atlas').db('classes_data');
+	var c = db.collection('student')
+	var i
+    client.login().then(() => {
+	  for(i=0; i<=20; i++) {
+		c.deleteOne({ })
+	  }
+//	  while(c.find( { } )) {
+//	  	console.log("removing")
+//		c.deleteOne( { } )
+//	  }
 
-};
-
-exports = function() {
-    var mongodb = context.services.get("mongodb-atlas");
-    var coll = mongodb.db("test").collection("example");
-    coll.insertOne({x: 1});
-};
-
-myFunction = function() {
-	document.getElementById("demo").innerHTML = "NOOO";
-};
-
+    }).catch(err => {
+      console.error(err)
+    });
+  });
+  
+  };
+  
+  
 </script>
 
 
@@ -52,6 +87,7 @@ myFunction = function() {
 </form>
 
 <button onclick='myFunction()'>Click me</button>
+<button onclick='clearFunction()'>Clear</button>
 
 <p id="output"></p>
 <p id="demo"></p>
