@@ -18,34 +18,28 @@
     const db = client.service('mongodb', 'mongodb-atlas').db('classes_data');
 	c = db.collection('student')
     client.login().then(() => {
-	  console.log("adding")
 	  if(c.find({"Name": person}) != 'undefined') {
-		console.log(person, " found")
 	    classes = prompt("Please enter your classes,section", "CMSC330,0101,CMSC351,0402,ENME331,0101");
 		c.updateOne({"Name": person}, {$set:{"Classes":classes}}, {upsert:true})
 	  } else {
 	    classes = prompt("Please enter your classes,section", "CMSC330,0101,CMSC351,0402,ENME331,0101");
 		c.insertOne({"Name": person}, {"Classes": classes})
-		console.log("not found")
 	  }
     }).then(()=> 
 		db.collection('student').find().limit(100).execute() 
     ).then(docs => {
 	  var printer = c.aggregate([]);
-	  console.log("printer")
-	  console.log("before iterating docs")
-	  console.log(docs)
 	  docs.forEach((docs) => {
+		var curr_person = docs.Name;
 		var curr = docs.Classes + '\0';
 		var i=0;
 		var min = 0;
 		var first_char=0;
 		var class_name;
 		var section_number;
-		console.log("before while loop")
+		document.getElementById("demo").innerHTML = 5 + 6;
 		while(curr.charAt(i) != '\0' && i<curr.length) {
 			if(curr.charAt(i) == ',') {
-				console.log("----", i , "----"); 
 				class_name = curr.substr(first_char, i-first_char);
 				console.log(class_name, "<-- class name")
 				section_number = curr.substr(i+1, 4)
@@ -53,28 +47,63 @@
 				first_char = i+6;
 				i=i+5;
 				if (class_map.has(class_name)) {
+					console.log("111111111111111111111")
 					if(class_map.get(class_name).has(section_number)) { 
-						if(class_map.get(class_name).get(section_number).has(person)) {
-							console.log("the person is already in the system wtfffff", person)
+						if(class_map.get(class_name).get(section_number).has(curr_person)) {
+							console.log("the person is already in the system wtfffff", curr_person)
 						}
 						else {
-							classes_map.get(class_name).get(section_number).add(person)
+							class_map.get(class_name).get(section_number).add(curr_person)
+							console.log(class_map.get(class_name).get(section_number))
+							console.log("AAAAAAAAAAAAAAA", curr_person)
 						}
 					}
 					else {
-						class_map.get(class_name).set(section_number, new Set([person]));
+						console.log("BBBBBBBBBBBBBBBB")
+						class_map.get(class_name).set(section_number, new Set([curr_person]));
 					}
 				}
 				else {
+					console.log("222222222222222", curr_person)
 					class_map.set(class_name, new Map());
-					class_map.get(class_name).set(section_number, new Set([person]))
+					class_map.get(class_name).set(section_number, new Set())
+					console.log(class_map.get(class_name).get(section_number))
+					console.log(class_map.get(class_name).get(section_number).add(curr_person))
+//					console.log(class_map.get(class_name).get(section_number).entries().next())
+					console.log(class_map.get(class_name).get(section_number))
 				}
 			}
 			i++;
 		}
-//		console.log(docs.Classes.length);
-		console.log(class_map);
+//		console.log(docs.Classes.length);		
+//		document.getElementById("demo").innerHTML += Array.from(class_map.get("CMSC351").get("0402")).join(", ");
 	  });
+	  
+	  
+	  	var iterator1 = class_map.keys();
+		var class_num;
+		document.getElementById("demo").innerHTML = "";
+		for (class_num=0; class_num<class_map.size; class_num++) {
+			var current_class = iterator1.next().value;
+			document.getElementById("demo").innerHTML += (current_class) + "\n";
+			var iterator2 = class_map.get(current_class).keys();
+			var Map2 = class_map.get(current_class);
+			var section_num;
+			for(section_num=0; section_num<Map2.size; section_num++ ) {
+				var current_section = iterator2.next().value;
+				document.getElementById("demo").innerHTML += "<p><span class=\"tab\"> ->" + current_section + "</span></p>";
+				var p;
+				var set3 = Map2.get(current_section);
+				var iterator3 = set3.entries();
+//				console.log(class_map.get(class_name).get(section_number))
+				console.log(set3.size, " <-- ")	
+				var x
+				console.log(class_map.get(current_class).get(current_section))
+				for(let x of class_map.get(current_class).get(current_section)) {
+					document.getElementById("demo").innerHTML += "<p><span class=\"tab\"> -----------" + x + "</span></p>";
+				};
+			};
+		};
 //	  class_iterator.forEach((cla) => {
 //	   	console.log(cla)
 //	  })
@@ -101,7 +130,7 @@
       c.find().limit(1).execute()
     ).then(docs => {
 	  var printer = c.aggregate([]);
-	  console.log("printer --> ")
+	  console.log("printer -- ")
 	  console.log(printer)
 	  
     }).catch(err => {
