@@ -1,7 +1,7 @@
 <script src="https://s3.amazonaws.com/stitch-sdks/js/library/v3/stable/stitch.min.js"></script>
 <script>
 //  var SortedMap = require("sortedmap");
-  var person;
+  var person="";
   var classes;
   var classes_list = [];
   var class_map = new Map();
@@ -9,6 +9,8 @@
   const clientPromise = stitch.StitchClientFactory.create('sweet_scheduler-opazw');
   window.onload = function() {
 	person = prompt("Please enter your name", "Harry Potter");
+	classes = prompt("Please enter your classes,section", "CMSC330,0101,CMSC351,0402,ENME331,0101");
+	first_set();
   }
   
   
@@ -18,13 +20,12 @@
     const db = client.service('mongodb', 'mongodb-atlas').db('classes_data');
 	c = db.collection('student')
     client.login().then(() => {
-	  if(c.find({"Name": person}) != 'undefined') {
-	    classes = prompt("Please enter your classes,section", "CMSC330,0101,CMSC351,0402,ENME331,0101");
+//	  if(c.find({"Name": person}) != 'undefined') {
 		c.updateOne({"Name": person}, {$set:{"Classes":classes}}, {upsert:true})
-	  } else {
-	    classes = prompt("Please enter your classes,section", "CMSC330,0101,CMSC351,0402,ENME331,0101");
-		c.insertOne({"Name": person}, {"Classes": classes})
-	  }
+//	  } else {
+//		c.insertOne({"Name": person}, {"Classes": classes})
+//	  }
+	  //classes = prompt("Please enter your classes,section", "CMSC330,0101,CMSC351,0402,ENME331,0101");
     }).then(()=> 
 		db.collection('student').find().limit(100).execute() 
     ).then(docs => {
@@ -85,13 +86,13 @@
 		document.getElementById("demo").innerHTML = "";
 		for (class_num=0; class_num<class_map.size; class_num++) {
 			var current_class = iterator1.next().value;
-			document.getElementById("demo").innerHTML += (current_class) + "\n";
+			document.getElementById("demo").innerHTML += "<box><main>" + (current_class) + ": ";
 			var iterator2 = class_map.get(current_class).keys();
 			var Map2 = class_map.get(current_class);
 			var section_num;
 			for(section_num=0; section_num<Map2.size; section_num++ ) {
 				var current_section = iterator2.next().value;
-				document.getElementById("demo").innerHTML += "<p><span class=\"tab\"> ->" + current_section + "</span></p>";
+				document.getElementById("demo").innerHTML += "<section>" + current_section + ": </section>";
 				var p;
 				var set3 = Map2.get(current_section);
 				var iterator3 = set3.entries();
@@ -100,8 +101,9 @@
 				var x
 				console.log(class_map.get(current_class).get(current_section))
 				for(let x of class_map.get(current_class).get(current_section)) {
-					document.getElementById("demo").innerHTML += "<p><span class=\"tab\"> -----------" + x + "</span></p>";
+					document.getElementById("demo").innerHTML += "<person>" + x + "</person><br>";
 				};
+				document.getElementById("demo").innerHTML += "</main><br><br>"
 			};
 		};
 //	  class_iterator.forEach((cla) => {
@@ -140,6 +142,7 @@
 	};
   
   clearFunction = function() {
+  if(person == "Rohit") {
 //  const clientPromise = stitch.StitchClientFactory.create('sweet_scheduler-opazw');
   clientPromise.then(client => {
     const db = client.service('mongodb', 'mongodb-atlas').db('classes_data');
@@ -158,7 +161,7 @@
       console.error(err)
     });
   });
-  
+  };
   };
   
   
@@ -168,6 +171,32 @@
 <html>
 <title>SweetScheduler</title>
 <head>
+<style>
+box {
+
+}
+main {
+    font-size: 40px;
+	font-family: "Times New Roman", Times, serif;
+	font-style: bold;
+}
+
+section {
+    font-size: 30px;
+	font-family: "Times New Roman", Times, serif;
+	font-style: italic;
+	padding: 15px;
+	
+}
+
+person {
+    font-size: 20px;
+	font-family: "Times New Roman", Times, serif;
+	font-style: oblique;
+	margin: 45px;
+}
+
+</style>
 </head>
 
 <body>
@@ -180,7 +209,7 @@
   <button onclick='myFunction()'>submit</button>
 </form> -->
 
-<button onclick='first_set()'>welcome!</button>
+<button onclick='first_set()'>Update Schedule!</button>
 <button onclick='myFunction()'>Click me</button>
 <button onclick='clearFunction()'>Clear</button>
 
